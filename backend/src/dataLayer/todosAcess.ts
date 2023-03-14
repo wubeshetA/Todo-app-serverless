@@ -20,6 +20,7 @@ export class TodosAccess {
         private readonly todosIndex = process.env.INDEX_NAME,
     ) {}
 
+    // get all todos for a user
     async getAllTodos(userId: string): Promise<TodoItem[]> {
         logger.info('Getting all todos')
 
@@ -36,6 +37,8 @@ export class TodosAccess {
         return items as TodoItem[]
     }
 
+
+    // Create a new todo item in the table
     async createTodoItem(todoItem: TodoItem): Promise<TodoItem> {
         logger.info('Creating todo item')
 
@@ -48,10 +51,14 @@ export class TodosAccess {
         return todoItem as TodoItem
     }
 
+
+    // Update a todo item in the table
     async updateTodoItem(
         todoId: string,
         todoUpdate: TodoUpdate,
         userId: string): Promise<TodoUpdate> {
+
+            
         logger.info('Update todo item function called')
 
         const result = await this.docClient.update({
@@ -72,7 +79,8 @@ export class TodosAccess {
             ReturnValues: 'ALL_NEW'
         }).promise()
 
-        const todoItemUpdate = result.Attributes as TodoUpdate
+        // const todoItemUpdate = result.Attributes as TodoUpdate
+        const todoItemUpdate = result.Attributes
         logger.info('Todo item updated', todoItemUpdate)
         return todoItemUpdate as TodoUpdate
     }
@@ -93,20 +101,39 @@ export class TodosAccess {
     }
 
 
-
-    async updateTodoAttachmentUrl(todoId: string, userId: string, attachmentUrl: string): Promise<void> {
-        logger.info('Updating todo attachment url')
-
-        await this.docClient.update({
+    async addAttachmentUrl(
+        userId: string,
+        todoId: string,
+        url: string
+      ): Promise<TodoItem> {
+        logger.info('Add Attachment URL', {
+          todoId,
+          userId
+        })
+    
+        const updateResult = await this.docClient
+          .update({
             TableName: this.todosTable,
             Key: {
-                todoId,
-                userId
+              userId,
+              todoId
             },
-            UpdateExpression: 'set attachmentUrl = :attachmentUrl',
+            ConditionExpression: 'userId = :userId and todoId = :todoId',
+            ExpressionAttributeNames: {
+              '#urls': 'attachmentUrl'
+            },
             ExpressionAttributeValues: {
-                ':attachmentUrl': attachmentUrl
-            }
-        }).promise()
-    }
+              ':userId': userId,
+              ':todoId': todoId,
+              ':newUrl': url
+            },
+            UpdateExpression: 'SET #urls = :newUrl',
+            ReturnValues: 'ALL_NEW'
+          })
+          .promise()
+    
+        return updateResult.Attributes as TodoItem
+      }
+
+
 }

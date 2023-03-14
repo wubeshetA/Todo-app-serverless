@@ -29,13 +29,13 @@ export async function createTodo(
         logger.info("create todo function called")
     const todoId = uuid.v4()
     const createdAt = new Date().toISOString()
-    const s3AttachmentUrl = await attachmentUtils.getUploadUrl(todoId)
+    // const s3AttachmentUrl = await attachmentUtils.getUploadUrl(todoId)
     const newItem = {
         todoId,
         userId,
         createdAt,
         done: false,
-        attachmentUrl: s3AttachmentUrl,
+        attachmentUrl: null,
         ...newTodo
     }
     logger.info('Creating new item', newItem)
@@ -64,12 +64,24 @@ export async function deleteTodo(
     return todosAccess.deleteTodoItem(todoId, userId)
     }
 
-// Generate upload url function
+    
+// generate upload url function
 export async function createAttachmentPresignedUrl(
     todoId: string,
     userId: string
-    ): Promise<string> {
-        const loginfo = `generate upload url function called by user: ${userId} for todo:  ${todoId}`
-        logger.info(loginfo)
-    return attachmentUtils.getUploadUrl(todoId)
-    }
+  ): Promise<string> {
+    logger.info('Generating upload url', { todoId, userId })
+    const attachmentId = uuid.v4()
+    const attachmentUrl = attachmentUtils.getAttachmentUrl(attachmentId)
+    const uploadUrl = attachmentUtils.getUploadUrl(attachmentId)
+  
+    const todoItem = await todosAccess.addAttachmentUrl(
+      userId,
+      todoId,
+      attachmentUrl
+    )
+    todoItem.attachmentUrl = uploadUrl
+    logger.info('URL updated', { todoItem })
+  
+    return todoItem.attachmentUrl
+  }
