@@ -1,7 +1,7 @@
 import * as AWS from 'aws-sdk'
-import * as AWSXRay from 'aws-xray-sdk'
+// import * as AWSXRay from 'aws-xray-sdk'
 
-
+var AWSXRay = require('aws-xray-sdk');
 
 const XAWS = AWSXRay.captureAWS(AWS)
 
@@ -21,6 +21,7 @@ getAttachmentUrl(todoId: string) {
     return `https://${this.bucketName}.s3.amazonaws.com/${todoId}`
 }
 
+// Get signed url for uploading attachment
 getUploadUrl(todoId: string): string {
     console.log("getUploadUrl called")
     const url = this.s3.getSignedUrl('putObject', {
@@ -28,6 +29,7 @@ getUploadUrl(todoId: string): string {
         Key: todoId,
         Expires: urlExpiration
     })
+    console.log("getUploadUrl url : = : ", url)
     return url as string
 }  
 }
