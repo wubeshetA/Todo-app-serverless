@@ -2,9 +2,10 @@ import { TodosAccess } from '../dataLayer/todosAcess'
 import { AttachmentUtils } from '../helpers/attachmentUtils';
 import { TodoItem } from '../models/TodoItem'
 import { CreateTodoRequest } from '../requests/CreateTodoRequest'
-// import { UpdateTodoRequest } from '../requests/UpdateTodoRequest'
+import { UpdateTodoRequest } from '../requests/UpdateTodoRequest'
 import { createLogger } from '../utils/logger'
 import * as uuid from 'uuid'
+import { TodoUpdate } from '../models/TodoUpdate';
 // import * as createError from 'http-errors'
 
 // TODO: Implement businessLogic
@@ -40,4 +41,35 @@ export async function createTodo(
     logger.info('Creating new item', newItem)
     console.log("newItem : = : ", newItem)
     return await todosAccess.createTodoItem(newItem)
+    }
+
+// Update todo function
+export async function updateTodo(
+    
+    todoId: string,
+    todoUpdate: UpdateTodoRequest,
+    userId: string
+    ): Promise<TodoUpdate> {
+        logger.info("update todo function called")
+    return todosAccess.updateTodoItem(todoId, todoUpdate, userId)
+    }
+
+
+// Delete todo function
+export async function deleteTodo(
+    todoId: string,
+    userId: string
+    ): Promise<string> {
+        logger.info("delete todo function called")
+    return todosAccess.deleteTodoItem(todoId, userId)
+    }
+
+
+// Generate upload url function
+export async function createAttachmentPresignedUrl(
+    todoId: string,
+    userId: string
+    ): Promise<string> {
+        logger.info("generate upload url function called by user: ", userId, " for todo: ", todoId, "")
+    return attachmentUtils.getUploadUrl(todoId)
     }
