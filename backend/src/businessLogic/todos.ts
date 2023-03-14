@@ -8,7 +8,17 @@ import * as uuid from 'uuid'
 import { TodoUpdate } from '../models/TodoUpdate';
 // import * as createError from 'http-errors'
 
-// TODO: Implement businessLogic
+/*
+  This file contains functions that interact with the dataLayer.
+  It contains the business logic for the application.
+    It contains the following functions:
+        - getTodosForUser
+        - createTodo
+        - updateTodo
+        - deleteTodo
+        - createAttachmentPresignedUrl
+The functions are exported so that they can be used in the lambda functions.
+*/
 
 const logger = createLogger('TodosAccess')
 const todosAccess = new TodosAccess()
@@ -29,13 +39,13 @@ export async function createTodo(
         logger.info("create todo function called")
     const todoId = uuid.v4()
     const createdAt = new Date().toISOString()
-    const s3AttachmentUrl = await attachmentUtils.getUploadUrl(todoId)
+    // const s3AttachmentUrl = await attachmentUtils.getUploadUrl(todoId)
     const newItem = {
         todoId,
         userId,
         createdAt,
         done: false,
-        attachmentUrl: s3AttachmentUrl,
+        attachmentUrl: null,
         ...newTodo
     }
     logger.info('Creating new item', newItem)
@@ -64,12 +74,24 @@ export async function deleteTodo(
     return todosAccess.deleteTodoItem(todoId, userId)
     }
 
-
-// Generate upload url function
+    
+// generate upload url function
 export async function createAttachmentPresignedUrl(
     todoId: string,
     userId: string
-    ): Promise<string> {
-        logger.info("generate upload url function called by user: ", userId, " for todo: ", todoId, "")
-    return attachmentUtils.getUploadUrl(todoId)
-    }
+  ): Promise<string> {
+    logger.info('Generating upload url', { todoId, userId })
+    const attachmentId = uuid.v4()
+    const attachmentUrl = attachmentUtils.getAttachmentUrl(attachmentId)
+    const uploadUrl = attachmentUtils.getUploadUrl(attachmentId)
+  
+    const todoItem = await todosAccess.addAttachmentUrl(
+      userId,
+      todoId,
+      attachmentUrl
+    )
+    todoItem.attachmentUrl = uploadUrl
+    logger.info('URL updated', { todoItem })
+  
+    return todoItem.attachmentUrl
+  }
