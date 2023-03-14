@@ -21,11 +21,13 @@ getAttachmentUrl(todoId: string) {
     return `https://${this.bucketName}.s3.amazonaws.com/${todoId}`
 }
 
-getUploadUrl(todoId: string) {
-    return this.s3.getSignedUrl('putObject', {
+getUploadUrl(todoId: string): string {
+    console.log("getUploadUrl called")
+    const url = this.s3.getSignedUrl('putObject', {
         Bucket: this.bucketName,
         Key: todoId,
         Expires: urlExpiration
     })
+    return url as string
 }  
 }
