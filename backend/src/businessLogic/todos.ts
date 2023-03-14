@@ -8,7 +8,17 @@ import * as uuid from 'uuid'
 import { TodoUpdate } from '../models/TodoUpdate';
 // import * as createError from 'http-errors'
 
-// TODO: Implement businessLogic
+/*
+  This file contains functions that interact with the dataLayer.
+  It contains the business logic for the application.
+    It contains the following functions:
+        - getTodosForUser
+        - createTodo
+        - updateTodo
+        - deleteTodo
+        - createAttachmentPresignedUrl
+The functions are exported so that they can be used in the lambda functions.
+*/
 
 const logger = createLogger('TodosAccess')
 const todosAccess = new TodosAccess()

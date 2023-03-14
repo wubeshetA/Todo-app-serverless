@@ -5,7 +5,14 @@ var AWSXRay = require('aws-xray-sdk');
 
 const XAWS = AWSXRay.captureAWS(AWS)
 
-// TODO: Implement the fileStogare logic
+
+/**
+ * AttachmentUtils class contains all the functions that interact
+ * with the S3 bucket. It contains the following functions:
+ *    - getAttachmentUrl
+ *    - getUploadUrl
+ *  The class is exported so that it can be used in the businessLogic.
+ */
 
 const s3BucketName = process.env.ATTACHMENT_S3_BUCKET
 // const urlExpiration = process.env.SIGNED_URL_EXPIRATION

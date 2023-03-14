@@ -5,15 +5,26 @@ import { createLogger } from '../utils/logger'
 import { TodoItem } from '../models/TodoItem'
 import { TodoUpdate } from '../models/TodoUpdate';
 
+
+// write documnetation for the following code
+
 var AWSXRay = require('aws-xray-sdk');
 
 const XAWS = AWSXRay.captureAWS(AWS)
 
 const logger = createLogger('TodosAccess')
 
-// TODO: Implement the dataLayer logic
-
+/*
+TodoAccess class contains all the functions that interact
+with the DynamoDB table. It contains the following functions:
+    - getAllTodos
+    - createTodoItem
+    - updateTodoItem
+    - deleteTodoItem
+The class is exported so that it can be used in the businessLogic.
+*/
 export class TodosAccess {
+
     constructor(
         private readonly docClient: DocumentClient =  new XAWS.DynamoDB.DocumentClient(),
         private readonly todosTable = process.env.TODOS_TABLE,
